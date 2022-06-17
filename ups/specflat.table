@@ -1,0 +1,2 @@
+envAppend(PATH, ${PRODUCT_DIR}/bin)
+envPrepend(IDL_PATH, +${PRODUCT_DIR}/pro)

@@ -1,0 +1,285 @@
+-------------------------------------------------------------------------------
+v1_33 2020-11-20 DRL
+
+Add b1 pixel flats for MaNGA MJDs 56690 and 57590, created by R. Yan.
+
+-------------------------------------------------------------------------------
+v1_32 2020-04-28 DRL
+
+Many updates to pixel biases, pixel flats, bad pixel masks for 2018-2020
+observations by R. Yan.
+
+-------------------------------------------------------------------------------
+v1_31 2018-03-08 DRL
+
+Remove some bad columns from r1 mask on 56908 that didn't need to be
+flagged and collided with MaNGA minibundles.
+
+-------------------------------------------------------------------------------
+v1_30 2018-03-05 DRL
+
+Added new pixbias and badpix files for r1 on MJD 56908 based on analysis
+by Renbin Yan of time-variable behaviour in both.
+
+-------------------------------------------------------------------------------
+
+v1_29 2018-03-01 VM
+Tagging a new version with modifications to the b2 badpixel mask
+Adding badpixels-57617-b2.fits.gz pixflatave-57617-b2.fits.gz ; badpixel and pixflat 
+  B2 camera after it was replaced in 2016 Summer shutdown
+  
+updating badpixels-58019-b2.fits.gz; the earlier version has 1 column offset for
+a bad column [2266,2267] B2 Camera.updating the previous mask with the 
+correct file created by Renbin.  
+-------------------------------------------------------------------------------
+v1_28 2017-11-04 VM
+same as v1_27 but  with updated r2 badpixel mask
+v1_27 2017-10-20 VM
+New pixelflats and badpixel files after 2017  summer shutdown
+-------------------------------------------------------------------------------
+v1_26, 2015-03-05 DRL
+
+2015-03-02 DRL
+Add bad pixel file for r2 on MJD 56859.
+
+-------------------------------------------------------------------------------
+
+v1_25, 2014-11-20 DRL
+Tag to eliminate new b1/b2 pixels flats, which were bad.
+
+2014-11-20 D. Law
+Based on analysis by Kai Zhang, remove pixflatave-56859-b*.  These were
+not taken at different collimator positions, so have artifacts.
+
+-------------------------------------------------------------------------------
+
+v1_24, 2014-11-18 DRL
+Tag for new pixel biases and flats
+
+2014-11-16 D. Law
+Added new pixel bias and pixel flat files for all 4 cameras
+on mjd 56859 (r1 had already been done, this adds b1/b2/r2)
+
+-------------------------------------------------------------------------------
+
+v1_23, 2014-11-07 DRL
+Tag with new r1 pixbias and badpix
+
+2014-11-07 D. Law
+Added specflat_version.pro
+
+2014-11-05 D. Law
+Added Kai's initial pixbias and badpix files for r1 on mjd 56859.
+
+-------------------------------------------------------------------------------
+v1_22, 2014-10-26 SJB+JEB+KZ
+Tag with new r1 CCD pixflat
+
+2014-10-26 Kai Zhang (MaNGA)
+Updated preproc_pixflat.pro and median_*.py code to propagate headers
+indicating which input files were used to create the output files.
+
+2014-10-26 JEB
+New lossy fiber flat added for r1 :
+pixflatave-56858-r1 from MJD 56952 data, for new CCD installed during 2014 summer shut down 
+
+-------------------------------------------------------------------------------
+v1_21, 2014-04-08, SJB
+Tag for BOSS galaxy DR12
+
+2014-04-04, SJB
+Updating pixflat codes and instructions.  New lossy fiber pixflats added:
+pixflatave-56475-r? from MJD 56475 and 56476 before Summer 2013 shutdown
+pixflatave-56521-r1 from MJD 56680 data, starting with beginning of 2013-2014 season
+pixflatave-56698-r1 from MJD 56712 data, after r1 maintenance in Feb 2014
+pixflatave-56656-r2 from MJD 56732 data, after r2 vaccum loss Dec 23-30 2013
+--> We do not have lossy fiber data for r2 covering the time between the
+    2013 shutdown and the r2 vacuum loss in Dec 2013.  Continue to use
+    previous pixmask.
+
+2014-1-16, MDO
+
+Update badpixel masks for r2  from MJD 56649 
+Add new boss_pixbias files for r2  from MJD 56649 
+
+
+2013-05-21, Stephen
+Starting to add code for lossy fiber pixflat generation.
+pro/preproc_pixflats.pro : run sdssproc on multiple exposures and group
+    into a single fits file for later processing convenience
+bin/median_flatten.py : x,y median filter images and write out
+bin/median_stack.py : median stack a set of images
+--> Purposefully without executable permissions to not polute the
+    shell namespace.  Use "python $SPECFLAT_DIR/bin/median_flatten.py" etc.
+dev/*.fits.gz : development versions of the MJD 56055/56056 lossy fiber flats.
+
+2012-08-31, Matt:
+
+Update all badpixel masks to include bad columns from ticket 1424
+  
+Add new boss_pixbias files for b2 after voltage change from MJD 56170 
+
+-------------------------------------------------------------------------------
+v1_19, 2012-08-15
+Adding new boss_pixbias files for season 2012B, generated from
+bias data on MJD 56152 (ASB, 15 Aug 2012).
+
+Add bad pixel masks (with no bad pixels) for SDSS-I spectra, needed
+for SDSSPROC (ticket #541).
+    badpixels-50000-*.fits.gz
+
+Added new bad pixel mask and pixbias for r1 after temperature change on 55850.  The bad column went away
+   - badpixels-55850-r1.fits.gz
+   - boss_pixbias-55850-r1.fits.gz
+
+-------------------------------------------------------------------------------
+v1_18, 2011-09-08, Matt:
+Added new pixel biases generated by bolton_biasgen and another set using spbiasgen and v5_4_35.  Also add a few bad columns to b2 badpixels.  
+
+-------------------------------------------------------------------------------
+v1_17, 2011-09-08, Stephen:
+Added pixflatave-55800-r1.fits.gz with lossy fiber pixflats for new r1 CCD.
+
+2011-09-08, Matt & Kyle:
+Added bad pixel mask for new r1 (one bad column section ~10 pixels that will get rid of at least one fiber)
+   -badpixels-55800-r1.fits.gz
+
+-------------------------------------------------------------------------------
+v1_16 (2011-Aug-08, ASB):
+
+Added new pixel biases generated by bolton_biasgen
+  - boss_pixbias-55170-[b,r][1,2].fits.gz
+  - boss_pixbias-55300-[b,r][1,2].fits.gz
+for use with bolton_biassub
+(Motivated by ticket #1388 -- ASB)
+
+-------------------------------------------------------------------------------
+v1_15 (2011-08-02, Stephen)
+
+Updated pixflats with those made from lossy fiber flats:
+  - pixflatave-55056-b2.fits.gz
+  - pixflatave-55056-b1.fits.gz
+  - pixflatave-55415-r2.fits.gz
+  - pixflatave-55415-r1.fits.gz
+
+Removed b1/b2 flats from 55415 (r1/r2 cameras changed, but not b1/b2)
+  - pixflatave-55415-b1.fits.gz
+  - pixflatave-55415-b2.fits.gz
+
+-------------------------------------------------------------------------------
+Converting table file, Makefile, etc. into latest SDSS-III standard.
+
+-------------------------------------------------------------------------------
+
+v1_14 (July 05, 2011)
+
+Tagging a version including the Olmstead/Dawson bad-pixels masks (ASB).
+
+-------------------------------------------------------------------------------
+v1_13 (Feb 18, 2011)
+
+New pixel flats for after the switch to 2-amp readout on the red CCDs
+starting on MJD 55415 (summer 2010).  Constructed by Matt O. using
+LED flats in 3 positions, and including bad pixels and bad columns
+as he did before.  More details posted to boss-pipeline/1366:
+https://sdss3.org/mailman/private/boss-pipeline/all/1366.html
+
+-------------------------------------------------------------------------------
+v1_12 (Aug 05, 2010)
+
+Changed pixel flats to also include bad pixels and bad columns.
+The bad pixels come from using combinebpm.pro (in pro/specflat)
+with ncount=15.  For 55055 used bias 101768-101783 and darks 101786-101790.
+For 55300, used biases 113265-113283 and darks 113289-113298.  Matt O.
+
+-------------------------------------------------------------------------------
+v1_11 (April 16, 2010)
+
+Install gzipped FITS files.
+
+-------------------------------------------------------------------------------
+v1_10 (April 16, 2010)
+
+Add BOSS bias for MJD 55300 for replacement r2 CCD.
+Done with 25-frame bias sequence 113262-113285.
+Replace biases from the 3 cameras labeled as 55055 with these.
+
+Added pixel flat for replacement r2 CCD on MJD 55300.
+Done with 15-frame sequence of LED flats 113197-113211 on MJD 55300.
+
+Added BOSS biases for MJD 55055 using a 25-frame sequence from MJD 55271.
+Replace pixel flats with better ones made with LED data on MJD 55287.
+
+-------------------------------------------------------------------------------
+v1_9 (Mar 31, 2010)
+
+First pixel flats for BOSS from LED flats.
+
+-------------------------------------------------------------------------------
+v1_8 (Sep 25, 2009)
+
+Added biases and flats for MJD 55026, which is for Lauren's
+simulations.  These are not actually appropriate for real BOSS data.
+
+-------------------------------------------------------------------------------
+v1_7 (Nov 10, 2006)
+
+The pixel flats "pixflatave-53981-*.fits" were added to changes in the
+b1 & b2 PR 6650 contamination which happened after the cameras were
+warmed/pumped/cooled again over the 2006 shutdown. There is some
+thought that the cameras had been cooled down in a hurry (i.e. without
+extensive post-shutdown pumping) over the 2005 shutdown. The cameras
+were well pumped over the 2006 shutdown, and the new flats look much
+closer to the v1_5 flats.  Built from five nights of dithered flats:
+53999, 54022, 54023, 54024, 54027. All were taken with 15-position
+sweeps; some were taken with 3 esposures per position; three different
+cartridges were used.
+The new flats are backdated to shortly after the shutdown.
+
+-------------------------------------------------------------------------------
+v1_6 (Dec 20, 2005)
+
+The pixel flats "pixflatave-53678-*.fits" were added to deal
+with contamination of the b2 CCD in particular in the summer 2005
+shutdown (c.f., PR #6650).  Craig Loomis checked in these flats,
+but I do not have the details of how they were generated.
+
+-------------------------------------------------------------------------------
+v1_5 (Apr 1, 2003)
+
+ups/specflat.table: Change flavor to "NULL".
+
+-------------------------------------------------------------------------------
+v1_4 (Mar 29, 2002)
+
+First set of global biases (pixbiasave-*.fits) from many nights of data.
+Pixel flats now based on more nights of data.
+
+-------------------------------------------------------------------------------
+v1_3 (Jan 24, 2002)
+
+Include biases for idlspec2d v4_9_1.
+
+Include bias frames for use by SDSSPROC in the "idlspec2d" product.
+This first set of biases was generated from exposure #7608-7615 on
+MJD 52893 using the procedure SPBIASGEN.
+
+-------------------------------------------------------------------------------
+v1_2 (Aug 9, 2001)
+
+New version of the flats using the v4_8_1 version of idlspec2d that
+treat the edge effects better w/out any fudging after their creation.
+
+-------------------------------------------------------------------------------
+v1_1 (Jul 17, 2001)
+
+Move the flats into the /flats subdirectory.
+
+-------------------------------------------------------------------------------
+v1_0
+
+The pixel flats used for all the v4_0 to v4_7 reductions were
+  pixflat-51781-*.fits
+which were generated from a set of 7 flats on MJD=51781 with the
+cvs version of the idlspec2d code on 2000-08-25 (pre-v4_0_0).
+

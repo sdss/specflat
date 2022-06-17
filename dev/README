@@ -1,0 +1,13 @@
+This directory is for files which are under development and which
+we wish to track for reference, but they aren't ready to be placed
+into production in the standard flat/ and bias/ directories.
+
+pixflatave-*-56055.fits.gz:
+Generated from lossy fiber test data on MJD 56055 exps 143494-143553 (sp1)
+and MJD 56056 exps 143560-143619 (sp2).  They slightly differ from
+the previous versions, but are not distinctly better.
+
+--> they do *not* have the extra masked regions added by hand, and
+    thus they cannot be used as-is.
+
+
