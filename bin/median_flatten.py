@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 Perform a windowed median flattening of the images in an input fits file.
@@ -9,7 +9,7 @@ Stephen Bailey, LBL, 2013
 
 import numpy as N
 from scipy.ndimage import median_filter
-import pyfits
+from astropy.io import fits as pyfits
 
 import optparse
 parser = optparse.OptionParser(usage = "%prog [options]")
@@ -23,13 +23,13 @@ nw = opts.window  #- Median filtering window size
 
 fx = pyfits.open(opts.input)
 if opts.numimages < len(fx):
-    print "Processing %d of %d input images" % (opts.numimages, len(fx))
+    print( "Processing %d of %d input images" % (opts.numimages, len(fx)))
 
 nmax = min(opts.numimages, len(fx))
 
 #- start at 1 since HDU 0 is the mask
 for i in range(1, nmax):
-    print i
+    print( i)
     d = fx[i].data
     ny, nx = d.shape
     
@@ -60,16 +60,16 @@ for i in range(1, nmax):
 
     #- Special case: r1/r2 central rows
     if opts.input.count('r1') == 1 or opts.input.count('r2') == 1:
-        print "Fixing central rows for R channel"
-        yy = range(2050,2060) + range(2068,2078)
-        ymid = range(2060, 2068)
+        print("Fixing central rows for R channel")
+        yy = list(range(2050,2060)) + list(range(2068,2078))
+        ymid = list(range(2060, 2068))
         for ix in range(0, nx):
             p = N.polyfit(yy, d[yy, ix], 5)
             pix = N.polyval(p, ymid)
             pixflat[ymid, ix] = d[ymid, ix] / pix
      # Make hdu primary and hdulist
     if i == 1:
-        pyfits.writeto(opts.output, pixflat,fx[i].header, clobber=True)
+        pyfits.writeto(opts.output, pixflat,fx[i].header, overwrite=True)
     else:
         pyfits.append(opts.output, pixflat,fx[i].header)
 fx.close()

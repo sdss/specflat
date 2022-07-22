@@ -1,41 +1,21 @@
+specflat is a SDSS product built for the BOSS idlspec2D pipeline. 
 
-The current set of biases were produced on 22 Mar 2002:
 
-spbiasgen,mjd=51781,outdir='.'
-spbiasgen,mjd=51809,outdir='.'
-spbiasgen,mjd=51852,outdir='.'
-spbiasgen,mjd=51893,outdir='.'
-spbiasgen,mjd=51950,outdir='.'
-spbiasgen,mjd=51978,outdir='.'
-spbiasgen,mjd=52010,outdir='.'
-spbiasgen,mjd=52038,outdir='.'
-spbiasgen,mjd=52069,outdir='.'
-spbiasgen,mjd=52161,outdir='.'
-spbiasgen,mjd=52193,outdir='.'
-spbiasgen,mjd=52216,outdir='.'
-spbiasgen,mjd=52245,outdir='.'
-spbiasgen,mjd=52276,outdir='.'
-spbiasgen,mjd=52304,outdir='.'
-spbiasgen,mjd=52333,outdir='.'
-spbiasave,mjout=1
 
-The current set of flats were produced on 22 Mar 2002:
+It contains a number of products:
+    pixflatave-{MJD}-{b/r}{1/2}.fits
+        - average pixel-to-pixel flat fields
+        - Produced by spflatave.pro (idlspec2d) from pixflat-{MJD}-{b/r}{1/2}.fits produced by spflatgen.pro (idlspec2d)
+    badpixels-{MJD}-{b/r}{1/2}.fits
+        - a bad pixel mask (including hot pixels) from from a set of darks and biases
+        - Produced by combinebpm.pro (idlspec2d)
+    boss_pixbias-{MJD}-{b/r}{1/2}.fits.gz 
+        - 4-amplifier master bias frame 
+        - Produced by bolton_biasgen.pro (idlspec2d)
+        - replaced the historical pixbiasave product
+    pixbiasave-{MJD}-{b/r}{1/2}.fits.gz -  
+        - Historical product - 4-amplifier master bias frame
+        - Produced by spbiasave.pro (idlspec2d) from pixbias-{MJD}-{b/r}{1/2}.fits produced by spbiasgen.pro (idlspec2d)
+   
 
-spflatgen,mjd=51781,outdir='.'
-spflatgen,mjd=51809,outdir='.'
-spflatgen,mjd=51852,outdir='.'
-spflatgen,mjd=51893,outdir='.'
-spflatgen,mjd=51950,outdir='.'
-spflatgen,mjd=51978,outdir='.'
-spflatgen,mjd=52010,outdir='.'
-spflatgen,mjd=52038,outdir='.'
-spflatgen,mjd=52069,outdir='.'
-spflatgen,mjd=52161,outdir='.'
-spflatgen,mjd=52193,outdir='.'
-spflatgen,mjd=52216,outdir='.'
-spflatgen,mjd=52245,outdir='.'
-spflatgen,mjd=52276,outdir='.'
-spflatgen,mjd=52304,outdir='.'
-spflatgen,mjd=52333,outdir='.'
-spflatave,mjout=1
-
+It also contains the idl procedures to generate lossy-fiber pixflats 

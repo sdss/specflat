@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 Median combine multiple extensions of multiple fits files
@@ -8,7 +8,7 @@ sub-images and medianize as we go.
 """
 
 import sys
-import pyfits
+from astropy.io import fits
 import numpy as N
 from time import time
 
@@ -21,11 +21,11 @@ parser.add_option("-n", "--numimages",  type="int",  help="number of images to i
 opts, args = parser.parse_args()
 
 if opts.output is None:
-    print "You must specify and output file (-o)"
+    print("You must specify and output file (-o)")
     sys.exit(1)
 
 if len(args) == 0:
-    print "You must specify some input files"
+    print("You must specify some input files")
     sys.exit(1)
 
 #- First check how big these files are
@@ -33,7 +33,7 @@ if len(args) == 0:
 nimages = dict()
 image_shape = None
 for filename in args:
-    fx = pyfits.open(filename)
+    fx = fits.open(filename)
     nimages[filename] = len(fx)
     # Make the filelist in header  KZ
     if filename == args[0]:
@@ -52,40 +52,40 @@ for filename in args:
     fx.close()
     
     if image_shape is None:
-        d = pyfits.getdata(filename, 0)
+        d = fits.getdata(filename, 0)
         image_shape = d.shape
 
 ny,nx = image_shape
 if opts.numimages is not None:
     ntot = opts.numimages
 else:
-    ntot = N.sum(nimages.values())
+    ntot = N.sum(list(nimages.values()))
 
 t0 = time()
-print 'Allocating memory'
+print('Allocating memory')
 data = N.zeros( (ntot, ny, nx), dtype='float32')
-print '  --> %.1f' % (time() - t0, )
+print('  --> %.1f' % (time() - t0, ))
 
 i = 0
 for filename in args:
     if i >= ntot: break
     for j in range(nimages[filename]):                
         t0 = time()
-        d = pyfits.getdata(filename, j).astype('float32')
+        d = fits.getdata(filename, j).astype('float32')
         d[d != d] = 1  #- reset NaN
         data[i] = d
-        print '%s %d %.1f' % (filename, i, time() - t0)
+        print('%s %d %.1f' % (filename, i, time() - t0))
         i += 1
         if i >= ntot: break
         
-print 'medianizing'
+print('medianizing')
 t0 = time()
 
 #- medianize in chunks
 median_image = N.zeros(image_shape)
 step = 500
 for xmin in range(0, nx, step):
-    print xmin
+    print(xmin)
     for ymin in range(0, ny, step):
         xmax = min(xmin+step, nx)
         ymax = min(ymin+step, ny)
@@ -94,9 +94,9 @@ for xmin in range(0, nx, step):
         
         median_image[iy, ix] = N.median(data[:, iy, ix], axis=0)
         
-print '%.1f' % (time() - t0, )
+print('%.1f' % (time() - t0, ))
 
-print 'writing output'
-pyfits.writeto(opts.output, median_image, header_all,clobber=True)
+print('writing output')
+fits.writeto(opts.output, median_image, header_all,overwrite=True)
 
 

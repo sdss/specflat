@@ -73,6 +73,9 @@ end
 
 pro preproc_pixflats, mjd, camera, expstart, expstop, outdir=outdir
    
+    RESOLVE_ALL, /QUIET, /SKIP_EXISTING, /CONTINUE_ON_ERROR
+
+
    if not keyword_set(outdir) then outdir = '.'
    outdir += '/'   ; for later outdir+outfile
    
@@ -81,6 +84,7 @@ pro preproc_pixflats, mjd, camera, expstart, expstop, outdir=outdir
    for expid=expstart, expstop do begin
        camexpid = camera + '-' + string(expid, format="(I08)")
        infile = strcompress(string(mjd), /remove_all)+'/sdR-'+camexpid+'.fit.gz'
+       if not file_test(indir + infile) then continue
        x = mrdfits(indir + infile, 0, hdr, /silent)
        exptime = uint(sxpar(hdr, 'EXPTIME'))
        
