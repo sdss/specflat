@@ -71,19 +71,19 @@ function maskfilter, image, ivar
     return, result
 end
 
-pro preproc_pixflats, mjd, camera, expstart, expstop, outdir=outdir
+pro preproc_pixflats, mjd, camera, expstart, expstop, outdir=outdir,indir=indir
    
     RESOLVE_ALL, /QUIET, /SKIP_EXISTING, /CONTINUE_ON_ERROR
 
 
    if not keyword_set(outdir) then outdir = '.'
    outdir += '/'   ; for later outdir+outfile
-   
-   indir = getenv('BOSS_SPECTRO_DATA') + '/'
+   if not keyword_set(indir) then indir = getenv('BOSS_SPECTRO_DATA') + '/'
    index=0
    for expid=expstart, expstop do begin
        camexpid = camera + '-' + string(expid, format="(I08)")
        infile = strcompress(string(mjd), /remove_all)+'/sdR-'+camexpid+'.fit.gz'
+       print,indir+infile
        if not file_test(indir + infile) then continue
        x = mrdfits(indir + infile, 0, hdr, /silent)
        exptime = uint(sxpar(hdr, 'EXPTIME'))

@@ -55,7 +55,7 @@ def makeBPM(mjd, darkrange, biasrange, obs='apo', ver=''):
 
     with open(ptt.join('.', 'badPixelMask', mjd+ver, 'bpm_'+obs+'.cmd'), 'w') as cmdfile:
             t = cmdfile.write("#!/bin/bash"+"\n")
-            if obs.lower == 'lco': ccds = ['r2','b2']
+            if obs.lower() == 'lco': ccds = ['r2','b2']
             else: ccds = ['r1','b1']
 
             for ccd in ccds:
@@ -95,6 +95,6 @@ if __name__ == "__main__":
         if 'bias' in args.type: makepixBias(args.mjd, args.biasrange, obs='apo', ver=args.ver)
     if args.LCO is True: 
         if 'bpm' in args.type: makeBPM(args.mjd, args.darkrange, args.biasrange, obs='lco', ver=args.ver)
-        if 'bias' in args.type: makepixBias(arg.mjd, args.biasrange, obs='lco', ver=args.ver)
+        if 'bias' in args.type: makepixBias(args.mjd, args.biasrange, obs='lco', ver=args.ver)
 
     chdir(cwd)
