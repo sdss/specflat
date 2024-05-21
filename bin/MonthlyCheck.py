@@ -3,20 +3,20 @@
 from astropy.io import fits
 import argparse
 import os.path as ptt
-from sdss_access import SDSSPath
+from sdss_access import Path
 from glob import glob
 from os import makedirs, chmod, getcwd, chdir, environ
 import subprocess
 import pandas as pd
 
-path = SDSSPath(release='sdss5', preserve_envvars=True)
+path = Path(release='sdsswork', preserve_envvars=True)
 
 def makepixBias(mjd, biasrange, obs='apo', ver=''):
     makedirs(ptt.join('.', 'pixBias', mjd+ver),exist_ok = True)
     with open(ptt.join('.', 'pixBias',mjd+ver,'pixBias_'+obs+'.cmd'), 'w') as cmdfile:
         t = cmdfile.write("#!/bin/bash"+"\n")
         
-        sdR = path.full('sdR', mjd=mjd, br='b', id='*', frame='*').replace('apo',obs)
+        sdR = path.full('sdR', mjd=mjd, br='b', id='*', frame='*').replace('apo',obs)+'*'
         cmd = "idl -e 'bolton_biasgen, ["
         fileList = glob(sdR)
         for i, sdR_f in enumerate(fileList):
@@ -25,11 +25,12 @@ def makepixBias(mjd, biasrange, obs='apo', ver=''):
             hdr=fits.getheader(sdR_f,0)
             hdr=fits.getheader(sdR_f,0)
             if hdr['FLAVOR'] == 'bias': cmd = cmd+'"'+sdR_f+'",'
+        
         cmd = cmd[:-1] +"],/outbias' > pixBias_"+obs+".log"
         t = cmdfile.write(cmd+'\n')
         t = cmdfile.write('\n')
 
-        sdR = path.full('sdR', mjd=mjd, br='r', id='*', frame='*').replace('apo',obs)
+        sdR = path.full('sdR', mjd=mjd, br='r', id='*', frame='*').replace('apo',obs)+'*'
         cmd = "idl -e 'bolton_biasgen, ["
         fileList = glob(sdR)
         for i, sdR_f in enumerate(fileList):
