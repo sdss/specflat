@@ -10,6 +10,17 @@ Stephen Bailey, LBL, 2013
 import numpy as N
 from scipy.ndimage import median_filter
 from astropy.io import fits as pyfits
+import os.path as ptt
+
+def check_extension_exists(fits_file, extname):
+    if not ptt.exists(fits_file): 
+        return False
+    with pyfits.open(fits_file) as hdul:
+        for hdu in hdul:
+            if 'EXTNAME' in hdu.header and hdu.header['EXTNAME'] == extname:
+                return True
+        return False
+
 
 import optparse
 parser = optparse.OptionParser(usage = "%prog [options]")
@@ -17,6 +28,7 @@ parser.add_option("-i", "--input", type="string",  help="input data")
 parser.add_option("-o", "--output", type="string",  help="output data")
 parser.add_option("-n", "--numimages", type="int",  help="number of images to process", default=1000)
 parser.add_option("-w", "--window", type="int",  help="median window size (%default)", default=51)
+parser.add_option("--clobber",  action='store_true', help='clobber the existing output file')
 opts, args = parser.parse_args()
 
 nw = opts.window  #- Median filtering window size
@@ -29,7 +41,10 @@ nmax = min(opts.numimages, len(fx))
 
 #- start at 1 since HDU 0 is the mask
 for i in range(1, nmax):
-    print( i)
+    print( i, fx[i].header['EXTNAME'])
+    if not opts.clobber:
+        if check_extension_exists(opts.output,fx[i].header['EXTNAME']):
+            continue
     d = fx[i].data
     ny, nx = d.shape
     
@@ -69,7 +84,10 @@ for i in range(1, nmax):
             pixflat[ymid, ix] = d[ymid, ix] / pix
      # Make hdu primary and hdulist
     if i == 1:
-        pyfits.writeto(opts.output, pixflat,fx[i].header, overwrite=True)
+        if opts.clobber:
+            pyfits.writeto(opts.output, pixflat,fx[i].header, overwrite=True)
+        else:
+            pyfits.append(opts.output, pixflat,fx[i].header)
     else:
         pyfits.append(opts.output, pixflat,fx[i].header)
 fx.close()

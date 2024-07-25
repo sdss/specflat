@@ -71,6 +71,28 @@ function maskfilter, image, ivar
     return, result
 end
 
+function check_fits_extension, filename, ext_name
+    if not FILE_TEST(filename) then return, 0
+
+    ; Open the FITS file
+    fits_open, filename, hdulist
+    ; Check if the extension exists
+    exists = 0
+    n_ext = n_elements(hdulist.EXTNAME)
+    FOR i=1, n_ext-1 DO BEGIN
+	IF strupcase(strtrim(hdulist.extname[i],2)) EQ strupcase(ext_name) THEN BEGIN
+            exists = 1
+	    BREAK
+        ENDIF
+    ENDFOR
+    
+    ; Close the FITS file
+    fits_close, hdulist
+    return, exists
+    END
+
+
+
 pro preproc_pixflats, mjd, camera, expstart, expstop, outdir=outdir,indir=indir
    
     RESOLVE_ALL, /QUIET, /SKIP_EXISTING, /CONTINUE_ON_ERROR
@@ -94,6 +116,11 @@ pro preproc_pixflats, mjd, camera, expstart, expstop, outdir=outdir,indir=indir
        
        print, infile, exptime
        ;- Create infile list 
+
+       if check_fits_extension(outdir+outfile, infile) then begin
+         splog,'Extension already exists, continuing....'
+	 continue
+        endif
        sdssproc, indir+infile, image, ivar, /silent, /applybias, /nopixflat
 
        ;- Write mask image to HDU 0
@@ -102,6 +129,7 @@ pro preproc_pixflats, mjd, camera, expstart, expstop, outdir=outdir,indir=indir
        ;- Make file list   
        sxaddpar, hdr_list,'NFILE', strcompress(index+1,/remove)
        sxaddpar, hdr_list, 'FILE'+strcompress(index,/remove), infile 
+       sxaddpar, hdr_list, 'EXTNAME', infile
        ;;; print,hdr_list
        mwrfits,image,outdir+outfile,hdr_list,/silent             
 
