@@ -5,11 +5,25 @@ import argparse
 import os.path as ptt
 from sdss_access.path import Path
 from glob import glob
-from os import makedirs, chmod, getcwd, chdir, environ, remove
+from os import makedirs, chmod, getcwd, chdir, environ, remove, getenv
 import subprocess
 import pandas as pd
+import sys
+import Analysis
+#if ptt.exists(ptt.join(ptt.dirname(__file__), 'Analysis')):
+#    sys.path.append(ptt.join(ptt.dirname(__file__), 'Analysis'))
+#    run_anly=True
+#    import Analysis_v1 as Analysis
+#elif ptt.exists(ptt.join('.','Analysis')):
+#    sys.path.append(ptt.join('.','Analysis'))
+#    run_anly=True
+#    import Analysis_v1 as Analysis
+#else:
+#    run_anly=False
+
 
 path = Path(release='sdsswork', preserve_envvars=True)
+#environ['SPECFLAT_WORK_DIR'] = '/uufs/chpc.utah.edu/common/home/sdss50/sdsswork/bhm/boss/spectro/redux/test/sean/specflat/'
 
 def run(dir_, cmd, log=None, indir = None):
     cwd = getcwd()
@@ -25,7 +39,8 @@ def run(dir_, cmd, log=None, indir = None):
     chdir(cwd)
 
 
-def findgain(mjd, expid1, ver='', obs='apo', indir=None):
+
+def findgain(mjd, expid1, ver='', obs='apo', indir=None, analyze=False):
     makedirs(ptt.join('.', 'gains', mjd+ver),exist_ok = True)
     if indir is None:
         sdR = path.full('sdR', mjd=mjd, br='b', id='*', frame='*')
@@ -39,11 +54,14 @@ def findgain(mjd, expid1, ver='', obs='apo', indir=None):
         cmd = "boss_gain, "+expid1+", docams="+cams+", indir='"+indir+"'"
         t = cmdfile.write('idl -e "'+cmd+'"'+' > boss_gain.log'+"\n")
     run(ptt.join('.', 'gains', mjd+ver), 'boss_gain_'+obs+'.cmd')
-
+    if analyze:
+        gainfiles= Analysis.find_files(ptt.join('.', 'gains','*','boss_gain.log'))
+        Analysis.Gain_analysis(gainfiles, show=False, term=True)
 
 
 def LossyPixFlats(mjd, expid1, expid2, mjd2=None, expid2_1=None, expid2_2=None, outmjd=None, 
-                  ver='', obs='apo', blue_exptime = '500', red_exptime = '150',indir=None):
+                  ver='', obs='apo', blue_exptime = '500', red_exptime = '150',indir=None,
+                  analyze=False):
     if outmjd is None: outmjd = mjd
     makedirs(ptt.join('.', 'pixflats', mjd+ver),exist_ok = True)
     indir2 = indir
@@ -99,7 +117,9 @@ def LossyPixFlats(mjd, expid1, expid2, mjd2=None, expid2_1=None, expid2_2=None, 
         t = cmdfile.write('idl -e "'+cmd+'"')
 
     run(ptt.join('.', 'pixflats', mjd+ver), 'lossy_fiber_'+obs+'.cmd', log = "lossy_fiber_"+obs+".log")
-
+    if analyze:
+        Analysis.run('Flats', obs.upper(),tagged=False)
+        Analysis.run('Flatsf', obs.upper(),tagged=True)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Setup and run Lossy flat tests scripts')
@@ -117,10 +137,22 @@ if __name__ == "__main__":
     parser.add_argument('--blue_exptime', type=str, help='Blue Camera Flat Exposure Time', default=None)
     parser.add_argument('--red_exptime', type=str, help='Red Camera Flat Exposure Time', default=None)
     parser.add_argument('--ver', '-v', type=str, help='Run version for nights with multiple sets', default = '')
-    parser.add_argument('--outdir', '-d', type=str, help='Output Working Directory', default='./')
+    parser.add_argument('--outdir', '-d', type=str, help='Output Working Directory', default=None)
     parser.add_argument('--indir', type=str, help='Manual Input Directory', default=None)
+    parser.add_argument('--analyze', '-a', action='store_true', help='Produce Analysis plots')
     args = parser.parse_args()
 
+#    if not run_anly:
+#        if args.analyze:
+#            print('Analysis code not found, proceeding without running Analysis')
+#        args.analyze=False
+
+    if args.outdir is None:
+        args.outdir = getenv('SPECFLAT_WORK_DIR')
+        if args.outdir is None:
+            print("ENVVAR SPECFLAT_WORK_DIR is not set, defaulting to current directory")
+            args.outdir = '.'
+    environ['SPECFLAT_WORK_DIR'] = args.outdir
     cwd = getcwd()
     makedirs(args.outdir,exist_ok = True)
     chdir(args.outdir)
@@ -147,8 +179,9 @@ if __name__ == "__main__":
         LossyPixFlats(args.mjd, args.expid1, args.expid2, ver=args.ver, obs=ob, 
                       mjd2=args.mjd2, expid2_1 = args.expid2_1, expid2_2 = args.expid2_2,
                       outmjd=args.outmjd, blue_exptime = blue_exptime, 
-                      red_exptime = red_exptime,indir=args.indir)
+                      red_exptime = red_exptime,indir=args.indir, analyze=args.analyze)
 
-        findgain(args.gain_mjd, args.gain_expid1, ver=args.ver, obs=ob, indir=args.indir)
+        findgain(args.gain_mjd, args.gain_expid1, ver=args.ver, obs=ob, indir=args.indir,
+                analyze=args.analyze)
 
     chdir(cwd)
