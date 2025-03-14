@@ -19,7 +19,10 @@ from datetime import date
 import astropy.time
 from IPython.display import display, HTML
 
-from matplotlib import cm
+try:
+    from matplotlib import cm
+except:
+    pass
 from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 
 from sdss_access import Path
@@ -27,30 +30,50 @@ path = Path(release='sdsswork', preserve_envvars=True)
 
 
 def get_cmap():
-    cmap16 = cm.get_cmap('seismic', 13)
-    cmap16.colors=cmap16(range(0,13))
+    if True:#try:
+        cmap16 = plt.colormaps['seismic']
+        cmap16 = cmap16(np.linspace(0,1,13))
 
-    viridis = cm.get_cmap('viridis', 253)
-    newcolors = viridis(np.linspace(0, 1, 386))
+        viridis = plt.colormaps['viridis']
+        newcolors = viridis(np.linspace(0, 1, 386))
+
+        newcolors[0:109, :] = cmap16[0]  #32
+        newcolors[109:147, :] = cmap16[1] #16
+        newcolors[147:171, :] = cmap16[2] #8
+        newcolors[171:183, :] = cmap16[3] #4
+        newcolors[183:189, :] = cmap16[4] #2
+        newcolors[189:193, :] = cmap16[5] #1
+        newcolors[193:194, :] = cmap16[6] #0
+        
+        newcolors[194:198, :] = cmap16[7] #1
+        newcolors[198:204, :] = cmap16[8] #2
+        newcolors[204:216, :] = cmap16[9] #4
+        newcolors[216:240, :] = cmap16[10] #8
+        newcolors[240:278, :] = cmap16[11] #16
+        newcolors[278:, :] = cmap16[12] #32
+
+    else:#except:
+        cmap16 = cm.get_cmap('seismic', 13)
+        cmap16.colors=cmap16(range(0,13))
+
+        viridis = cm.get_cmap('viridis', 253)
+        newcolors = viridis(np.linspace(0, 1, 386))
+   
     
-    newcolors[0:109, :] = cmap16.colors[0]  #32
-    newcolors[109:147, :] = cmap16.colors[1] #16
-    newcolors[147:171, :] = cmap16.colors[2] #8
-    newcolors[171:183, :] = cmap16.colors[3] #4
-    newcolors[183:189, :] = cmap16.colors[4] #2
-    newcolors[189:193, :] = cmap16.colors[5] #1
-    newcolors[193:194, :] = cmap16.colors[6] #0
+        newcolors[0:109, :] = cmap16.colors[0]  #32
+        newcolors[109:147, :] = cmap16.colors[1] #16
+        newcolors[147:171, :] = cmap16.colors[2] #8
+        newcolors[171:183, :] = cmap16.colors[3] #4
+        newcolors[183:189, :] = cmap16.colors[4] #2
+        newcolors[189:193, :] = cmap16.colors[5] #1
+        newcolors[193:194, :] = cmap16.colors[6] #0
 
-    newcolors[194:198, :] = cmap16.colors[7] #1
-    newcolors[198:204, :] = cmap16.colors[8] #2
-    newcolors[204:216, :] = cmap16.colors[9] #4
-    newcolors[216:240, :] = cmap16.colors[10] #8
-    newcolors[240:278, :] = cmap16.colors[11] #16
-    newcolors[278:, :] = cmap16.colors[12] #32
-
-    
-
-    
+        newcolors[194:198, :] = cmap16.colors[7] #1
+        newcolors[198:204, :] = cmap16.colors[8] #2
+        newcolors[204:216, :] = cmap16.colors[9] #4
+        newcolors[216:240, :] = cmap16.colors[10] #8
+        newcolors[240:278, :] = cmap16.colors[11] #16
+        newcolors[278:, :] = cmap16.colors[12] #32
 
     newcmp = ListedColormap(newcolors)
     return(newcmp)
@@ -61,7 +84,7 @@ get_cmap()
 def run_analysis(savdir = 'bpm', OBS='APO', clobber=False, caltype='bpm', show=False, specflat_product=None, print_filelist=False, 
                  cmap='seismic', fcolors=['#ff7f0e','#2ca02c'], test=False, mjd=None, bpm_raw=False, term=False,mjd_only=None,
                  bias_range_red =None, bias_range_blue =None, bias_range =None, percentile=None,vrange=None,
-                 bias_diff_range=None, bias_diff_range_blue=None, bias_diff_range_red=None, ccds=None):
+                 bias_diff_range=None, bias_diff_range_blue=None, bias_diff_range_red=None, ccds=None, stage_dir = '..'):
     if caltype.lower()!='dark': make_struct(savdir, clobber=clobber)
     if ccds is None:
         if OBS.upper()=='APO': ccds=['r1', 'b1']
@@ -94,10 +117,10 @@ def run_analysis(savdir = 'bpm', OBS='APO', clobber=False, caltype='bpm', show=F
             if bias_diff_range_blue is not None:
                 bias_diff_range = bias_diff_range_blue
         
-        if   caltype.lower()=='bpm' : fpath1 = '../badPixelMask/?????/badpixels-*'+ccd+'*'
-        elif caltype.lower()=='dark': fpath1 = '../badPixelMask/?????/badpixels-*'+ccd+'*'
-        elif caltype.lower()=='flat': fpath1 = '../pixflats/?????/pixflatave-*'+ccd+'*'
-        elif caltype.lower()=='bias': fpath1 = '../pixBias/?????/boss_pixbias*'+ccd+'*'
+        if   caltype.lower()=='bpm' : fpath1 = ptt.join(stage_dir, 'badPixelMask','?????','badpixels-*'+ccd+'*')
+        elif caltype.lower()=='dark': fpath1 = ptt.join(stage_dir, 'badPixelMask','?????','badpixels-*'+ccd+'*')
+        elif caltype.lower()=='flat': fpath1 = ptt.join(stage_dir, 'pixflats','?????','pixflatave-*'+ccd+'*')
+        elif caltype.lower()=='bias': fpath1 = ptt.join(stage_dir, 'pixBias','?????','boss_pixbias*'+ccd+'*')
         if specflat_product is not None: 
             if   caltype.lower()=='bpm' : fpath2 = ptt.join(specflat_product, 'flats', 'badpixels-*'+ccd+'*.fits.gz')
             elif caltype.lower()=='dark': fpath2 = ptt.join(specflat_product, 'flats', 'badpixels-*'+ccd+'*.fits.gz')
@@ -202,6 +225,8 @@ def find_product_files(fpath, fpath2=None):
     files=(glob.glob(fpath))
     if fpath2 is not None: 
         files2 = glob.glob(fpath2)
+        filenames_list1 = {ptt.basename(file) for file in files}
+        files2 = [file for file in files2 if (ptt.basename(file) not in filenames_list1) and (ptt.splitext(ptt.basename(file))[0] not in filenames_list1)]
         files.extend(files2)
     files=np.unique(files).tolist()
     if len(files) == 0: return(None, None)
@@ -212,16 +237,17 @@ def find_product_files(fpath, fpath2=None):
 ################################################################################################
 ################################################################################################
 def tar_figs(folder, term=False):
-    ftype = ptt.basename(ptt.normpath(folder))
+    ftype = ptt.normpath(folder)
     mjd=(int(float(astropy.time.Time( str(date.today())).jd)-2400000.5))
     print('creating '+ftype+'_'+str(mjd)+'.tar.gz archive')
     out = tarfile.open(ftype+'_'+str(mjd)+'.tar.gz', mode='w')
     try:
         print('adding '+ftype)
-        out.add(ftype)
+        out.add(ftype, arcname= ptt.basename(ptt.normpath(folder)))
     finally:
         print('closing tar archive')
         out.close()
+    ftype =ptt.basename(ptt.normpath(folder))
     if term is False: 
         display(HTML("Download: <a href='https://data.sdss5.org/sas/sdsswork/bhm/boss/spectro/redux/test/sean/specflat/Analysis/"+ftype+"_"+str(mjd)+".tar.gz' download> "+ftype+"_"+str(mjd)+".tar.gz </a>"))
     else: 
@@ -274,7 +300,7 @@ def bpm_diff(file1, file2, cmap, fcolors, ccd = 'b1', show=True, savdir='bpm'):
         ax[i].legend(loc='best')
     plt.suptitle(str(getint2(file1))+'-'+str(getint2(file2))+ ' '+ ccd )
     plt.tight_layout()
-    plt.savefig(ptt.join('.',  savdir,ccd, str(getint2(file1))+'-'+str(getint2(file2))+ '_'+ ccd+'.png' ))
+    plt.savefig(ptt.join( savdir,ccd, str(getint2(file1))+'-'+str(getint2(file2))+ '_'+ ccd+'.png' ))
     if show is True: plt.show()
     else: plt.close()
     
@@ -324,7 +350,7 @@ def bpm(file1, cmap, fcolors, ccd = 'b1', show=True, savdir='bpm'):
         ax[i].legend(loc='best')    
     plt.suptitle(str(getint2(file1))+' '+ ccd )
     plt.tight_layout()
-    plt.savefig(ptt.join('.',  savdir,ccd, str(getint2(file1))+ '_'+ ccd+'.png' ))
+    plt.savefig(ptt.join(  savdir,ccd, str(getint2(file1))+ '_'+ ccd+'.png' ))
     if show is True: plt.show()
     else: plt.close()
    
@@ -387,7 +413,7 @@ def flat_diff(file1, file2,cmap, ccd = 'b1', show=True, savdir='Flats', percenti
     ax[i].legend(loc='best')    
     plt.suptitle(str(getint2(file1))+'-'+str(getint2(file2))+ ' '+ ccd )
     plt.tight_layout()
-    plt.savefig(ptt.join('.',  savdir,ccd, str(getint2(file1))+'-'+str(getint2(file2))+ '_'+ ccd+'.png' ))
+    plt.savefig(ptt.join( savdir,ccd, str(getint2(file1))+'-'+str(getint2(file2))+ '_'+ ccd+'.png' ))
     if show is True: plt.show()
     else: plt.close()
     
@@ -447,7 +473,7 @@ def Bias_diff(file1, file2, cmap, ccd = 'b1', show=True, savdir='bias', bias_ran
     ax[i].legend(loc='best')   
     plt.suptitle(str(getint2(file1))+'-'+str(getint2(file2))+ ' '+ ccd )
     plt.tight_layout()
-    plt.savefig(ptt.join('.',  savdir,ccd, str(getint2(file1))+'-'+str(getint2(file2))+ '_'+ ccd+'.png' ))
+    plt.savefig(ptt.join( savdir,ccd, str(getint2(file1))+'-'+str(getint2(file2))+ '_'+ ccd+'.png' ))
     if show is True: plt.show()
     else: plt.close()
     bpm1 = None
@@ -457,7 +483,7 @@ def Bias_diff(file1, file2, cmap, ccd = 'b1', show=True, savdir='bias', bias_ran
     
 ################################################################################################
 ################################################################################################
-def Gain_analysis(gainfiles, show=False, term=False):
+def Gain_analysis(gainfiles, show=False, term=False, savdir = '.'):
     gains=pd.DataFrame()
     plt.close('all')
     gains = pd.concat([gains, pd.DataFrame.from_dict({'mjd': [58023], 'b2_0':[0.9787], 'b2_1':[1.0040], 'b2_2':[0.9647], 'b2_3':[1.0040], 
@@ -509,7 +535,7 @@ def Gain_analysis(gainfiles, show=False, term=False):
     plt.suptitle('BOSS-S CCD Gains')
     plt.tight_layout()
 
-    plt.savefig('gains_S.png')
+    plt.savefig(ptt.join(savedir,'gains_S.png'))
     if show is True: plt.show()
     else: plt.close()
     if term is False: display(HTML("Download: <a href='https://data.sdss5.org/sas/sdsswork/bhm/boss/spectro/redux/test/sean/specflat/Analysis/gains_S.png' download> gains_S.png </a>"))
@@ -566,7 +592,7 @@ def Gain_analysis(gainfiles, show=False, term=False):
     plt.suptitle('BOSS-N CCD Gains')
     plt.tight_layout()
 
-    plt.savefig('gains_N.png')
+    plt.savefig(ptt.join(savedir,'gains_N.png'))
     if show is True: 
         plt.show()
         fig.canvas.draw()
@@ -581,7 +607,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
             prog=ptt.basename(sys.argv[0]),
             description='Analyze a library of specflat library')
-    parser.add_argument('--staged_dir', help='Location of the staged specflat product products (default: ../)', default='..')
+    parser.add_argument('--staged_dir', help='Location of the staged specflat product products (default:  $SPECFLAT_WORK_DIR)', default=getenv('SPECFLAT_WORK_DIR'))
+    parser.add_argument('--savedir', help='Location to save the Analysis figure (default: $SPECFLAT_WORK_DIR/Analysis)', default = None)
     parser.add_argument('--lco', '-l', action='store_true', required=False, help='Run for LCO data')
     parser.add_argument('--tagged_loc', '-t', help ='Location of the tagged specflat product for comparison')
     parser.add_argument('--tagged_loaded', action='store_true',help='Load the tagged specflat production location from "SPECFLAT_DIR"')
@@ -590,28 +617,34 @@ if __name__ == "__main__":
     parser.add_argument('--bpm',  action='store_true',help='Analyze the Bad Pixel Masks')
     parser.add_argument('--gain', action='store_true',help='Analyze the CCD gains')
     parser.add_argument('--pixflat','--flat',  action='store_true', help='Analyze the Pixel Flats')
-
+    parser.add_argument('--percentile', type=float, required=False, nargs=2, help='Percentile Cuts for Pixel Flat Analysis (ex: 45 80)', default=None)
+    parser.add_argument('--vrange', type=float, required=False, nargs=2, help='scale range for Pixel Flat Analysis (ex: .992 1.008)', default=None)
+    parser.add_argument('--mjd', required=False, nargs='+', default=None, help='List of MJDs to include')
     args = parser.parse_args()
-
+    sav_base = ptt.join(getenv('SPECFLAT_WORK_DIR'), 'Analysis')
+    if args.savedir is not None:
+        sav_base = args.savedir
     if args.tagged_loaded:
         args.tagged_loc = getenv('SPECFLAT_DIR')
     if args.gain:
         gainfiles = find_files(ptt.join(args.staged_dir,'gains','*','boss_gain.log'))
-        Gain_analysis(gainfiles, show=False, term=True)
+        Gain_analysis(gainfiles, show=False, term=True, savdir=sav_base)
 
     if args.tagged_loc:
         flag = '_tagged'
     else:
         flag = ''
+
     obs = 'APO' if not args.lco else 'LCO'
     if args.bpm:   
-        run_analysis(savdir='bhm'+flag, OBS=obs, caltype='bpm', specflat_product=args.tagged_loc, 
-                    clobber=args.clobber, show=False, term=True)
+        run_analysis(savdir=ptt.join(sav_base,'bhm'+flag), OBS=obs, caltype='bpm', specflat_product=args.tagged_loc, 
+                    clobber=args.clobber, show=False, term=True, stage_dir = args.staged_dir)
     if args.bias:
-        run_analysis(savdir='bias'+flag, OBS=obs, caltype='bias', specflat_product=args.tagged_loc, 
-                    clobber=args.clobber, show=False, term=True)
+        run_analysis(savdir=ptt.join(sav_base,'bias'+flag), OBS=obs, caltype='bias', specflat_product=args.tagged_loc, 
+                    clobber=args.clobber, show=False, term=True, stage_dir = args.staged_dir)
     if args.pixflat:
-        run_analysis(savdir='Flat'+flag, OBS=obs, caltype='flat', specflat_product=args.tagged_loc, 
-                    clobber=args.clobber, show=False, term=True)
+        run_analysis(savdir=ptt.join(sav_base,'Flat'+flag), OBS=obs, caltype='flat', specflat_product=args.tagged_loc, 
+                    clobber=args.clobber, show=False, term=True, stage_dir = args.staged_dir,percentile=args.percentile,
+                    vrange = args.vrange, mjd_only = args.mjd)
 
             
